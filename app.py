@@ -17,7 +17,7 @@ API_URL = "https://api.merchwizard.com/api/dashboard/payable/"
 ANNUAL_BUDGET = 250_000
 MONTHLY_BUDGET = ANNUAL_BUDGET / 12
 
-IN_HOUSE_KEYWORDS = ["manhead", "mallory strong", "andrew chavez"]
+IN_HOUSE_KEYWORDS = ["manhead", "mallory strong", "andrew chavez", "ali cook", "maria fulan"]
 
 
 @st.cache_data(ttl=300)
@@ -226,6 +226,31 @@ client_summary = (
 )
 st.dataframe(client_summary, use_container_width=True)
 
+# === IN-HOUSE DESIGNER TOTALS ===
+st.header("In-House Designer Totals")
+in_house_df = filtered[filtered["In-House"] & filtered["Designer"].notna()]
+if not in_house_df.empty:
+    in_house_summary = (
+        in_house_df.groupby("Designer")
+        .agg(
+            {
+                "Submission": "sum",
+                "Balance": "sum",
+                "Separation": "sum",
+                "Total": "sum",
+                "ID": "count",
+            }
+        )
+        .rename(columns={"ID": "# Designs"})
+        .sort_values("Total", ascending=False)
+    )
+    col_ih1, col_ih2 = st.columns(2)
+    col_ih1.metric("In-House Total Spend", f"${in_house_df['Total'].sum():,.0f}")
+    col_ih2.metric("In-House Design Count", len(in_house_df))
+    st.dataframe(in_house_summary, use_container_width=True)
+else:
+    st.info("No in-house designs in the current filter.")
+
 # === BY DESIGNER ===
 st.header("By Designer")
 designer_summary = (
@@ -247,10 +272,22 @@ st.dataframe(designer_summary, use_container_width=True)
 
 # === CSV EXPORT ===
 st.header("Export")
-csv = filtered.drop(columns=["Created"]).to_csv(index=False)
+
+available_months = sorted(filtered["Month"].unique())
+export_month = st.selectbox("Select Month for Export", ["All Months"] + available_months)
+
+if export_month == "All Months":
+    export_df = filtered.drop(columns=["Created"])
+    export_label = "all"
+else:
+    export_df = filtered[filtered["Month"] == export_month].drop(columns=["Created"])
+    export_label = export_month
+
+csv = export_df.to_csv(index=False)
 st.download_button(
-    label="Download Filtered Data as CSV",
+    label=f"Download {export_month} Data as CSV",
     data=csv,
-    file_name=f"payable_designs_{datetime.now().strftime('%Y%m%d')}.csv",
+    file_name=f"payable_designs_{export_label}_{datetime.now().strftime('%Y%m%d')}.csv",
     mime="text/csv",
 )
+st.caption(f"{len(export_df)} records in export")
