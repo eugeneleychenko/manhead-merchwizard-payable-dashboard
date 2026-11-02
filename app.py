@@ -265,14 +265,14 @@ awaiting_fl = freelancer_df[freelancer_df["Payment Status"] == "Awaiting Approva
 footnotes = []
 if not awaiting_fl.empty:
     footnotes.append(
-        f"{len(awaiting_fl)} design(s) awaiting approval (${awaiting_fl['Total'].sum():,.0f}) "
+        f"{len(awaiting_fl)} design(s) awaiting approval (\\${awaiting_fl['Total'].sum():,.0f}) "
         "are not in the chart because they have no approval month yet."
     )
 undated_committed = committed_df[committed_df["Approved Month"].isna()]
 if not undated_committed.empty:
     footnotes.append(
         f"{len(undated_committed)} paid/outstanding design(s) "
-        f"(${undated_committed['Total'].sum():,.0f}) have no approval date and are not charted."
+        f"(\\${undated_committed['Total'].sum():,.0f}) have no approval date and are not charted."
     )
 if footnotes:
     st.caption(" ".join(footnotes))
@@ -302,7 +302,7 @@ if not outstanding_df.empty:
     if not unknown_age.empty:
         st.caption(
             f"{len(unknown_age)} outstanding design(s) "
-            f"(${unknown_age['Total'].sum():,.0f}) have no approval date and are not aged."
+            f"(\\${unknown_age['Total'].sum():,.0f}) have no approval date and are not aged."
         )
 
     overdue = outstanding_df[days_out >= 60].copy()
