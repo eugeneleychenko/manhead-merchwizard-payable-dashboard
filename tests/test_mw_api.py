@@ -289,6 +289,7 @@ def _response(status, payload=None):
 def cookie_env(monkeypatch):
     monkeypatch.setenv("MW_COOKIE_NAME", "remember_web_test")
     monkeypatch.setenv("MW_COOKIE_VALUE", "abc")
+    monkeypatch.delenv("MW_API_TOKEN", raising=False)
     monkeypatch.delenv("MW_FIXTURE_PATH", raising=False)
 
 
@@ -297,6 +298,22 @@ def test_headers(cookie_env):
     assert headers["Cookie"] == "remember_web_test=abc"
     assert headers["Referer"] == "https://merchwizard.com/dashboard/payable/"
     assert headers["Origin"] == "https://merchwizard.com"
+    assert "Authorization" not in headers
+
+
+def test_api_token_preferred_over_cookie(cookie_env, monkeypatch):
+    monkeypatch.setenv("MW_API_TOKEN", " 12|secrettoken \n")
+    headers = mw_api._headers()
+    assert headers == {"Authorization": "Bearer 12|secrettoken", "Accept": "application/json"}
+    # No Referer/Origin: the request must take Sanctum's token path, not the stateful one.
+    assert "Cookie" not in headers and "Referer" not in headers
+
+
+def test_token_alone_is_enough(monkeypatch):
+    monkeypatch.delenv("MW_COOKIE_NAME", raising=False)
+    monkeypatch.delenv("MW_COOKIE_VALUE", raising=False)
+    monkeypatch.setenv("MW_API_TOKEN", "12|secrettoken")
+    assert mw_api._headers()["Authorization"] == "Bearer 12|secrettoken"
 
 
 def test_401_raises_auth_error(cookie_env):
@@ -304,15 +321,16 @@ def test_401_raises_auth_error(cookie_env):
     session.get.return_value = _response(401, {"message": "Unauthenticated."})
     with pytest.raises(mw_api.MerchwizardAuthError) as exc:
         mw_api.fetch_open_payables(session)
-    assert "re-extract" in str(exc.value)
+    assert "app:dashboard-token" in str(exc.value)
+    assert "MW_API_TOKEN" in str(exc.value)
     assert "MW_COOKIE_VALUE" in str(exc.value)
-    assert "remember_web" in str(exc.value)
     session.get.return_value = _response(401, {"message": "Unauthenticated."})
     with pytest.raises(mw_api.MerchwizardAuthError):
         mw_api.fetch_paid_payables(session)
 
 
 def test_missing_cookie_raises_auth_error(monkeypatch):
+    monkeypatch.delenv("MW_API_TOKEN", raising=False)
     monkeypatch.delenv("MW_COOKIE_NAME", raising=False)
     monkeypatch.delenv("MW_COOKIE_VALUE", raising=False)
     with pytest.raises(mw_api.MerchwizardAuthError):

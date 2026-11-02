@@ -22,10 +22,14 @@ Push to `main` branch — Streamlit Cloud auto-deploys.
 Python / Streamlit / Pandas
 
 ## Env Vars
-- `MW_COOKIE_NAME` — Merchwizard auth cookie name
-- `MW_COOKIE_VALUE` — Merchwizard auth cookie value
+- `MW_API_TOKEN` — preferred. Sanctum bearer token issued on the API server with
+  `php artisan app:dashboard-token <staff email>` (Forge > site > Commands). Does not expire;
+  re-running the command revokes the previous `payable-dashboard` token.
+- `MW_COOKIE_NAME` / `MW_COOKIE_VALUE` — fallback only: a staff user's `remember_web_*` cookie.
+  It is invalidated whenever that user logs out or opens a login link, so expect it to break.
 
-The `remember_web` cookie from Merchwizard is valid for approximately one year. If the API returns `Unauthenticated`, re-extract the cookie from a logged-in browser session.
+If the API returns `Unauthenticated`, issue a new token and update both `.env` and the Streamlit
+Cloud secrets. In local dev, `MW_FIXTURE_PATH=tests/fixtures/ui_fixture.json` runs the app offline.
 
 ## Build / Dev Commands
 ```bash
@@ -54,7 +58,7 @@ python3 -m streamlit run app.py --server.port 8501
 ├── mw_api.py                           # Merchwizard data layer: fetch open + paid payables, normalize to one DataFrame
 ├── tests/                              # pytest suite for mw_api.py (fixtures only, no network)
 │   └── fixtures/                       # Sample API responses (e.g. paid_payables_sample.json)
-├── .env                                # Auth credentials (MW_COOKIE_NAME, MW_COOKIE_VALUE)
+├── .env                                # Auth credentials (MW_API_TOKEN, or cookie fallback)
 ├── transcript.md                       # Original requirements from Karina huddle
 ├── Monthly Art Budgets - January 2026.csv  # Reference spreadsheet
 └── payable_data.json                   # Cached API snapshot of open payables (45 records)

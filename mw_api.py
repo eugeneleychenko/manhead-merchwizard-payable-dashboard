@@ -39,12 +39,12 @@ NOT_RECORDED = "Not Recorded"
 PAYMENT_CREATED_FORMAT = "%m-%d-%Y %H:%M:%S"
 
 AUTH_INSTRUCTIONS = (
-    "Merchwizard returned Unauthenticated (401): the MW_COOKIE_NAME / MW_COOKIE_VALUE "
-    "cookie is missing or expired. The `remember_web_*` cookie is valid for about one "
-    "year. To fix it, re-extract the cookie from a logged-in browser session: log in "
-    "at https://merchwizard.com, copy the `remember_web_*` cookie name and value from "
-    "DevTools (Application > Cookies), and update "
-    "MW_COOKIE_NAME and MW_COOKIE_VALUE in .env and in the Streamlit Cloud secrets."
+    "Merchwizard returned Unauthenticated (401): the dashboard's credentials are missing, "
+    "expired or revoked. Preferred: set MW_API_TOKEN to a token issued on the API server with "
+    "`php artisan app:dashboard-token <staff email>` (Forge > site > Commands), in .env and in "
+    "the Streamlit Cloud secrets. Fallback: MW_COOKIE_NAME / MW_COOKIE_VALUE from a logged-in "
+    "browser session's `remember_web_*` cookie, which dies whenever that user logs out or opens "
+    "a login link."
 )
 
 # Existing columns, in the order the original app.py produced them. Do not rename.
@@ -83,7 +83,7 @@ NEW_COLUMNS = [
 
 
 class MerchwizardAuthError(RuntimeError):
-    """Raised when the Merchwizard API rejects the cookie (HTTP 401/419)."""
+    """Raised when the Merchwizard API rejects the token or cookie (HTTP 401/419)."""
 
     def __init__(self, message: str = AUTH_INSTRUCTIONS):
         super().__init__(message)
@@ -93,11 +93,22 @@ class MerchwizardAuthError(RuntimeError):
 
 
 def _headers() -> Dict[str, str]:
+    """Auth headers: a Sanctum bearer token when MW_API_TOKEN is set, else the cookie.
+
+    The bearer request deliberately carries no Referer/Origin so Sanctum takes its token
+    path instead of the stateful (browser-session) path.
+    """
+    token = (os.getenv("MW_API_TOKEN") or "").strip()
+    if token:
+        return {
+            "Authorization": "Bearer {}".format(token),
+            "Accept": "application/json",
+        }
     cookie_name = os.getenv("MW_COOKIE_NAME")
     cookie_value = os.getenv("MW_COOKIE_VALUE")
     if not cookie_name or not cookie_value:
         raise MerchwizardAuthError(
-            "Missing MW_COOKIE_NAME or MW_COOKIE_VALUE. " + AUTH_INSTRUCTIONS
+            "Missing MW_API_TOKEN (or MW_COOKIE_NAME / MW_COOKIE_VALUE). " + AUTH_INSTRUCTIONS
         )
     return {
         "Cookie": "{}={}".format(cookie_name, cookie_value),

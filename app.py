@@ -11,7 +11,8 @@ load_dotenv()
 st.set_page_config(page_title="Merchwizard Payables", layout="wide")
 st.title("Merchwizard Payable Designs")
 
-COOKIE_NAME = os.getenv("MW_COOKIE_NAME")
+API_TOKEN = os.getenv("MW_API_TOKEN")  # preferred: Sanctum token from `php artisan app:dashboard-token`
+COOKIE_NAME = os.getenv("MW_COOKIE_NAME")  # fallback: borrowed remember_web cookie
 COOKIE_VALUE = os.getenv("MW_COOKIE_VALUE")
 FIXTURE_PATH = os.getenv("MW_FIXTURE_PATH")  # offline mode: load rows from a JSON fixture
 API_URL = mw_api.API_URL
@@ -28,8 +29,8 @@ def fetch_payable_data(load_all_history: bool = False):
     return mw_api.load_payables(load_all_history, in_house_keywords=IN_HOUSE_KEYWORDS)
 
 
-if not FIXTURE_PATH and (not COOKIE_NAME or not COOKIE_VALUE):
-    st.error("Missing MW_COOKIE_NAME or MW_COOKIE_VALUE in .env file.")
+if not FIXTURE_PATH and not API_TOKEN and (not COOKIE_NAME or not COOKIE_VALUE):
+    st.error("Missing credentials: set MW_API_TOKEN (preferred) or MW_COOKIE_NAME + MW_COOKIE_VALUE.")
     st.stop()
 
 # The "Load all paid history" sidebar checkbox (UI section) should use
