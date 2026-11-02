@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
-import requests
 import os
 from datetime import datetime
 from dotenv import load_dotenv
+
+import mw_api
 
 load_dotenv()
 
@@ -12,7 +13,8 @@ st.title("Merchwizard Payable Designs")
 
 COOKIE_NAME = os.getenv("MW_COOKIE_NAME")
 COOKIE_VALUE = os.getenv("MW_COOKIE_VALUE")
-API_URL = "https://api.merchwizard.com/api/dashboard/payable/"
+FIXTURE_PATH = os.getenv("MW_FIXTURE_PATH")  # offline mode: load rows from a JSON fixture
+API_URL = mw_api.API_URL
 
 ANNUAL_BUDGET = 250_000
 MONTHLY_BUDGET = ANNUAL_BUDGET / 12
@@ -21,65 +23,30 @@ IN_HOUSE_KEYWORDS = ["manhead", "mallory strong", "andrew chavez", "ali cook", "
 
 
 @st.cache_data(ttl=300)
-def fetch_payable_data():
-    resp = requests.get(
-        API_URL,
-        headers={
-            "Cookie": f"{COOKIE_NAME}={COOKIE_VALUE}",
-            "Accept": "application/json",
-            "Referer": "https://merchwizard.com/dashboard/payable/",
-            "Origin": "https://merchwizard.com",
-        },
-    )
-    resp.raise_for_status()
-    data = resp.json()["data"]
-
-    rows = []
-    for item in data:
-        designer_name = item["designer"]["name"] if item.get("designer") else None
-        is_in_house = False
-        if designer_name:
-            is_in_house = any(
-                kw in designer_name.lower() for kw in IN_HOUSE_KEYWORDS
-            )
-
-        rows.append(
-            {
-                "ID": item["id"],
-                "Name": item["name"],
-                "Client": item["client"]["title"] if item.get("client") else None,
-                "Designer": designer_name,
-                "In-House": is_in_house,
-                "Submission": item.get("submission_fee", 0),
-                "Balance": item.get("balance_fee", 0),
-                "Separation": item.get("separation_fee", 0),
-                "Submission Invoice": item.get("submission_invoice", ""),
-                "Balance Invoice": item.get("balance_invoice", ""),
-                "Separation Invoice": item.get("separation_invoice", ""),
-                "Status": item.get("status"),
-                "Created": item.get("created_at", ""),
-                "Updated": item.get("updated_at", ""),
-            }
-        )
-
-    df = pd.DataFrame(rows)
-    df["Created"] = pd.to_datetime(df["Created"])
-    df["Created Date"] = df["Created"].dt.date
-    df["Month"] = df["Created"].dt.to_period("M").astype(str)
-    df["Updated"] = pd.to_datetime(df["Updated"]).dt.date
-    df["Total"] = df["Submission"] + df["Balance"] + df["Separation"]
-    return df
+def fetch_payable_data(load_all_history: bool = False):
+    """Open + paid payables as one DataFrame (see mw_api / Contract B)."""
+    return mw_api.load_payables(load_all_history, in_house_keywords=IN_HOUSE_KEYWORDS)
 
 
-if not COOKIE_NAME or not COOKIE_VALUE:
+if not FIXTURE_PATH and (not COOKIE_NAME or not COOKIE_VALUE):
     st.error("Missing MW_COOKIE_NAME or MW_COOKIE_VALUE in .env file.")
     st.stop()
 
+# The "Load all paid history" sidebar checkbox (UI section) should use
+# key="load_all_history"; its value is read here, before the fetch, on each rerun.
+load_all_history = bool(st.session_state.get("load_all_history", False))
+
 try:
-    df = fetch_payable_data()
+    df = fetch_payable_data(load_all_history)
+except mw_api.MerchwizardAuthError as e:
+    st.error(str(e))
+    st.stop()
 except Exception as e:
     st.error(f"Failed to fetch data: {e}")
     st.stop()
+
+if FIXTURE_PATH:
+    st.info(f"Offline mode: data loaded from fixture `{FIXTURE_PATH}` (MW_FIXTURE_PATH).")
 
 if st.button("Refresh Data"):
     st.cache_data.clear()
