@@ -1,0 +1,414 @@
+{
+  "pages": [
+    {
+      "data": [
+        {
+          "id": 300001,
+          "name": "DT_paidpaypal_tee",
+          "client_id": 5001,
+          "client": {
+            "id": 5001,
+            "title": "DEFTONES: 2026",
+            "name": "DEFTONES: 2026"
+          },
+          "status": 5,
+          "created_at": "2026-09-20T15:00:00.000000Z",
+          "updated_at": "2026-10-15T18:00:00.000000Z",
+          "approved_at": "2026-10-01T15:00:00.000000Z",
+          "completed_at": "2026-10-15T18:00:00.000000Z",
+          "submission_fee": 100,
+          "balance_fee": 200,
+          "separation_fee": 0,
+          "submission_invoice": "S300001",
+          "balance_invoice": "B300001",
+          "separation_invoice": "",
+          "payments": [
+            {
+              "id": 70001,
+              "designerId": 9001,
+              "paymentId": "BATCH-A1",
+              "paymentMethod": 1,
+              "paymentType": 1,
+              "payeeName": "Jeff Rigsby",
+              "paidByName": "Karina Ruiz",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "10-02-2026 12:00:00",
+              "amount": 100
+            },
+            {
+              "id": 70002,
+              "designerId": 9001,
+              "paymentId": "BATCH-B2",
+              "paymentMethod": 1,
+              "paymentType": 2,
+              "payeeName": "Jeff Rigsby",
+              "paidByName": "Eugene L",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "10-15-2026 17:59:00",
+              "amount": 200
+            }
+          ],
+          "designer_id": 9001,
+          "designer": {
+            "id": 9001,
+            "title": "Jeff Rigsby",
+            "name": "Jeff Rigsby",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        },
+        {
+          "id": 300002,
+          "name": "OD_checkpaid_tee",
+          "client_id": 5002,
+          "client": {
+            "id": 5002,
+            "title": "OD: Barbara Album Release",
+            "name": "OD: Barbara Album Release"
+          },
+          "status": 5,
+          "created_at": "2026-09-01T12:00:00.000000Z",
+          "updated_at": "2026-10-20T19:00:00.000000Z",
+          "approved_at": "2026-09-05T13:00:00.000000Z",
+          "completed_at": "2026-10-20T19:00:00.000000Z",
+          "submission_fee": 150,
+          "balance_fee": 0,
+          "separation_fee": 0,
+          "submission_invoice": "S300002",
+          "balance_invoice": "",
+          "separation_invoice": "",
+          "payments": [
+            {
+              "id": 70003,
+              "designerId": 9002,
+              "paymentId": null,
+              "paymentMethod": 2,
+              "paymentType": 1,
+              "payeeName": "Laura Price",
+              "paidByName": "Karina Ruiz",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "10-20-2026 18:55:00",
+              "amount": 150
+            }
+          ],
+          "designer_id": 9002,
+          "designer": {
+            "id": 9002,
+            "title": "Laura Price",
+            "name": "Laura Price",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        },
+        {
+          "id": 300003,
+          "name": "PS_mixed_tee",
+          "client_id": 5003,
+          "client": {
+            "id": 5003,
+            "title": "PAUL SIMON: Catalog",
+            "name": "PAUL SIMON: Catalog"
+          },
+          "status": 5,
+          "created_at": "2026-08-10T12:00:00.000000Z",
+          "updated_at": "2026-09-28T16:00:00.000000Z",
+          "approved_at": "2026-08-15T12:00:00.000000Z",
+          "completed_at": "2026-09-28T16:00:00.000000Z",
+          "submission_fee": 100,
+          "balance_fee": 100,
+          "separation_fee": 50,
+          "submission_invoice": "S300003",
+          "balance_invoice": "B300003",
+          "separation_invoice": "P300003",
+          "payments": [
+            {
+              "id": 70005,
+              "designerId": 9003,
+              "paymentId": "",
+              "paymentMethod": 2,
+              "paymentType": 2,
+              "payeeName": "Matt Cliff",
+              "paidByName": "Karina Ruiz",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "09-28-2026 15:30:00",
+              "amount": 100
+            },
+            {
+              "id": 70004,
+              "designerId": 9003,
+              "paymentId": "BATCH-C3",
+              "paymentMethod": 1,
+              "paymentType": 1,
+              "payeeName": "Matt Cliff",
+              "paidByName": "Eugene L",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "09-01-2026 10:00:00",
+              "amount": 100
+            }
+          ],
+          "designer_id": 9003,
+          "designer": {
+            "id": 9003,
+            "title": "Matt Cliff",
+            "name": "Matt Cliff",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        },
+        {
+          "id": 300004,
+          "name": "DT_inhouse_tee",
+          "client_id": 5001,
+          "client": {
+            "id": 5001,
+            "title": "DEFTONES: 2026",
+            "name": "DEFTONES: 2026"
+          },
+          "status": 5,
+          "created_at": "2026-09-02T12:00:00.000000Z",
+          "updated_at": "2026-09-30T20:00:00.000000Z",
+          "approved_at": "2026-09-03T12:00:00.000000Z",
+          "completed_at": "2026-09-30T20:00:00.000000Z",
+          "submission_fee": 0,
+          "balance_fee": 250,
+          "separation_fee": 0,
+          "submission_invoice": "",
+          "balance_invoice": "B300004",
+          "separation_invoice": "",
+          "payments": [],
+          "designer_id": 9004,
+          "designer": {
+            "id": 9004,
+            "title": "Manhead (Maria Fulan)",
+            "name": "Manhead (Maria Fulan)",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        },
+        {
+          "id": 300005,
+          "name": "OD_midnight_tee",
+          "client_id": 5002,
+          "client": {
+            "id": 5002,
+            "title": "OD: Barbara Album Release",
+            "name": "OD: Barbara Album Release"
+          },
+          "status": 5,
+          "created_at": "2026-10-01T12:00:00.000000Z",
+          "updated_at": "2026-11-01T03:30:00.000000Z",
+          "approved_at": "2026-10-05T14:00:00.000000Z",
+          "completed_at": "2026-11-01T03:30:00.000000Z",
+          "submission_fee": 75,
+          "balance_fee": 75,
+          "separation_fee": 0,
+          "submission_invoice": "S300005",
+          "balance_invoice": "B300005",
+          "separation_invoice": "",
+          "payments": [
+            {
+              "id": 70006,
+              "designerId": 9005,
+              "paymentId": "BATCH-D4",
+              "paymentMethod": 1,
+              "paymentType": 1,
+              "payeeName": "Tom Gordon",
+              "paidByName": "Karina Ruiz",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "11-01-2026 03:29:00",
+              "amount": 150
+            }
+          ],
+          "designer_id": 9005,
+          "designer": {
+            "id": 9005,
+            "title": "Tom Gordon",
+            "name": "Tom Gordon",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        }
+      ],
+      "links": {
+        "first": "https://api.merchwizard.com/api/dashboard/payable/history?page=1",
+        "last": "https://api.merchwizard.com/api/dashboard/payable/history?page=2",
+        "prev": null,
+        "next": "https://api.merchwizard.com/api/dashboard/payable/history?page=2"
+      },
+      "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 2,
+        "path": "https://api.merchwizard.com/api/dashboard/payable/history",
+        "per_page": 5,
+        "to": 5,
+        "total": 8
+      }
+    },
+    {
+      "data": [
+        {
+          "id": 300006,
+          "name": "PS_newyear_tee",
+          "client_id": 5003,
+          "client": {
+            "id": 5003,
+            "title": "PAUL SIMON: Catalog",
+            "name": "PAUL SIMON: Catalog"
+          },
+          "status": 5,
+          "created_at": "2025-12-01T12:00:00.000000Z",
+          "updated_at": "2026-01-01T02:15:00.000000Z",
+          "approved_at": "2025-12-10T15:00:00.000000Z",
+          "completed_at": "2026-01-01T02:15:00.000000Z",
+          "submission_fee": 200,
+          "balance_fee": 0,
+          "separation_fee": 0,
+          "submission_invoice": "S300006",
+          "balance_invoice": "",
+          "separation_invoice": "",
+          "payments": [
+            {
+              "id": 70007,
+              "designerId": 9006,
+              "paymentId": "",
+              "paymentMethod": 4,
+              "paymentType": 1,
+              "payeeName": "Leanna White",
+              "paidByName": "Karina Ruiz",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "01-01-2026 02:10:00",
+              "amount": 200
+            }
+          ],
+          "designer_id": 9006,
+          "designer": {
+            "id": 9006,
+            "title": "Leanna White",
+            "name": "Leanna White",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        },
+        {
+          "id": 300007,
+          "name": "DT_sepfee_AW1500SEPFEE",
+          "client_id": 5001,
+          "client": {
+            "id": 5001,
+            "title": "DEFTONES: 2026",
+            "name": "DEFTONES: 2026"
+          },
+          "status": 5,
+          "created_at": "2026-01-05T12:00:00.000000Z",
+          "updated_at": "2026-01-15T17:00:00.000000Z",
+          "approved_at": "2026-01-06T12:00:00.000000Z",
+          "completed_at": "2026-01-15T17:00:00.000000Z",
+          "submission_fee": 0,
+          "balance_fee": 0,
+          "separation_fee": 120,
+          "submission_invoice": "",
+          "balance_invoice": "",
+          "separation_invoice": "P300007",
+          "payments": [
+            {
+              "id": 70008,
+              "designerId": 9900,
+              "paymentId": "BATCH-E5",
+              "paymentMethod": 1,
+              "paymentType": 3,
+              "payeeName": "Alex Wexler",
+              "paidByName": "Karina Ruiz",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "01-15-2026 16:50:00",
+              "amount": 120
+            }
+          ],
+          "separator_id": 9900,
+          "separator": {
+            "id": 9900,
+            "title": "Alex Wexler",
+            "name": "Alex Wexler",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        },
+        {
+          "id": 300008,
+          "name": "OD_legacy_tee",
+          "client_id": 5002,
+          "client": {
+            "id": 5002,
+            "title": "OD: Barbara Album Release",
+            "name": "OD: Barbara Album Release"
+          },
+          "status": 5,
+          "created_at": "2024-05-10T12:00:00.000000Z",
+          "updated_at": "2024-05-10T12:00:00.000000Z",
+          "approved_at": null,
+          "completed_at": null,
+          "submission_fee": 300,
+          "balance_fee": 0,
+          "separation_fee": 0,
+          "submission_invoice": "S300008",
+          "balance_invoice": "",
+          "separation_invoice": "",
+          "payments": [
+            {
+              "id": 70009,
+              "designerId": 9001,
+              "paymentId": "",
+              "paymentMethod": 3,
+              "paymentType": 1,
+              "payeeName": "Jeff Rigsby",
+              "paidByName": "",
+              "status": 1,
+              "invoice": "",
+              "createdAt": "06-01-2024 12:00:00",
+              "amount": 300
+            }
+          ],
+          "designer_id": 9001,
+          "designer": {
+            "id": 9001,
+            "title": "Jeff Rigsby",
+            "name": "Jeff Rigsby",
+            "email": "",
+            "payment_method": 1,
+            "paypal_email": ""
+          }
+        }
+      ],
+      "links": {
+        "first": "https://api.merchwizard.com/api/dashboard/payable/history?page=1",
+        "last": "https://api.merchwizard.com/api/dashboard/payable/history?page=2",
+        "prev": "https://api.merchwizard.com/api/dashboard/payable/history?page=1",
+        "next": null
+      },
+      "meta": {
+        "current_page": 2,
+        "from": 6,
+        "last_page": 2,
+        "path": "https://api.merchwizard.com/api/dashboard/payable/history",
+        "per_page": 5,
+        "to": 8,
+        "total": 8
+      }
+    }
+  ]
+}
