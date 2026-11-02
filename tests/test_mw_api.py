@@ -373,7 +373,9 @@ def test_load_payables_network_default_window(cookie_env, open_rows, paid_pages)
     out = mw_api.load_payables(today=TODAY, in_house_keywords=KEYWORDS, session=session)
     assert session.get.call_args_list[1].kwargs["params"]["from"] == "2026-01-01"
     assert session.get.call_args_list[1].kwargs["params"]["undated"] == 0
-    assert len(out) == len(open_rows) + 8
+    # 8 paid rows returned; 300006 (paid 2025-12-31 New York) is dropped.
+    assert len(out) == len(open_rows) + 7
+    assert 300006 not in set(out["ID"])
 
 
 def test_load_payables_all_history_params(cookie_env, open_rows, paid_pages):
@@ -396,7 +398,29 @@ def test_load_payables_fixture(monkeypatch):
     session_cls.assert_not_called()
     paid_current = current[current["Payment Status"] == "Paid"]
     paid_all = everything[everything["Payment Status"] == "Paid"]
-    # Default: completed since 2026-01-01 (UTC day, like the endpoint), undated excluded.
-    assert set(paid_current["ID"]) == {300001, 300002, 300003, 300004, 300005, 300006, 300007}
-    assert set(paid_all["ID"]) == set(paid_current["ID"]) | {300008}
+    # Default: completed since 2026-01-01 (UTC day, like the endpoint), undated excluded,
+    # then 300006 (2026-01-01T02:15Z = 2025-12-31 New York) dropped as last year's payment.
+    assert set(paid_current["ID"]) == {300001, 300002, 300003, 300004, 300005, 300007}
+    assert set(paid_all["ID"]) == set(paid_current["ID"]) | {300006, 300008}
     assert set(CONTRACT_B_COLUMNS) <= set(current.columns)
+
+
+def test_default_window_drops_prior_ny_year_paid_rows(cookie_env, paid_rows):
+    # Fetched by from=2026-01-01 (UTC day) but paid 2025-12-31 in New York.
+    boundary = [r for r in paid_rows if r["id"] == 300006]
+    session = mock.Mock()
+    session.get.side_effect = [
+        _response(200, {"data": []}),
+        _response(200, {"data": boundary, "links": {"next": None}}),
+    ]
+    out = mw_api.load_payables(today=TODAY, in_house_keywords=KEYWORDS, session=session)
+    assert out.empty
+    assert set(CONTRACT_B_COLUMNS) <= set(out.columns)
+
+    session.get.side_effect = [
+        _response(200, {"data": []}),
+        _response(200, {"data": boundary, "links": {"next": None}}),
+    ]
+    everything = mw_api.load_payables(True, today=TODAY, in_house_keywords=KEYWORDS, session=session)
+    assert list(everything["ID"]) == [300006]
+    assert everything.iloc[0]["Paid Month"] == "2025-12"

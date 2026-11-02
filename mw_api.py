@@ -425,6 +425,18 @@ def _filter_paid_window(
     return kept
 
 
+def _drop_prior_year_paid(df: pd.DataFrame, year: int) -> pd.DataFrame:
+    """Drop Paid rows whose New York paid date falls before ``year``.
+
+    The history endpoint filters ``from`` on UTC days, so a design completed on
+    Dec 31 after 19:00 New York time (Jan 1 UTC) is fetched by the current-year
+    window but belongs to the previous year's Paid Month. Undated rows are kept.
+    """
+    paid_years = pd.to_datetime(df["Paid Date"], errors="coerce").dt.year
+    prior = (df["Payment Status"] == "Paid") & (paid_years < year)
+    return df[~prior].reset_index(drop=True)
+
+
 def load_payables(
     load_all_history: bool = False,
     today: Optional[date] = None,
@@ -434,8 +446,10 @@ def load_payables(
     """Fetch open + paid payables and return the Contract B DataFrame.
 
     Default window: paid designs completed since Jan 1 of the current New York
-    year, undated ones excluded. ``load_all_history=True`` fetches every
-    Completed design, undated included.
+    year, undated ones excluded. The endpoint filters on UTC days, so paid rows
+    whose New York Paid Date is still in the previous year (completed Dec 31
+    evening NY) are dropped after normalizing. ``load_all_history=True``
+    fetches every Completed design, undated included, and drops nothing.
 
     If ``MW_FIXTURE_PATH`` is set, rows come from that JSON file
     (``{"open": [...], "paid": [...]}``) instead of the network.
@@ -450,23 +464,26 @@ def load_payables(
     if fixture_path:
         open_rows, paid_rows = _load_fixture(fixture_path)
         paid_rows = _filter_paid_window(paid_rows, from_date, None, include_undated)
-        return normalize(open_rows, paid_rows, keywords, today)
+    else:
+        try:
+            from dotenv import load_dotenv
 
-    try:
-        from dotenv import load_dotenv
+            load_dotenv()
+        except ImportError:  # pragma: no cover
+            pass
 
-        load_dotenv()
-    except ImportError:  # pragma: no cover
-        pass
+        own_session = session is None
+        session = session or requests.Session()
+        try:
+            open_rows = fetch_open_payables(session)
+            paid_rows = fetch_paid_payables(
+                session, from_date=from_date, include_undated=include_undated
+            )
+        finally:
+            if own_session:
+                session.close()
 
-    own_session = session is None
-    session = session or requests.Session()
-    try:
-        open_rows = fetch_open_payables(session)
-        paid_rows = fetch_paid_payables(
-            session, from_date=from_date, include_undated=include_undated
-        )
-    finally:
-        if own_session:
-            session.close()
-    return normalize(open_rows, paid_rows, keywords, today)
+    df = normalize(open_rows, paid_rows, keywords, today)
+    if not load_all_history:
+        df = _drop_prior_year_paid(df, today.year)
+    return df

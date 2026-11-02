@@ -96,6 +96,6 @@ Key constants in `app.py`:
   - Months are bucketed in America/New_York (API timestamps are UTC).
 - `Paid Amount` is the sum of recorded `payments`; it is 0 when none were recorded (common for checks/cash). It is never substituted for `Total`; the UI highlights rows where they differ and the by-artist report shows a `Difference` column.
 - Undated paid designs (`completed_at` NULL, mostly legacy) show as "Paid (date unknown)". They count toward the budget via `Budget Year`, are excluded from the monthly paid-out report, and are never backfilled from `created_at`.
-- Default history window is the current year only. The sidebar "Load all paid history" checkbox fetches every Completed design, including undated ones (cached separately).
+- Default history window is the current year only (New York time: the endpoint filters `from` on UTC days, so `mw_api.load_payables` drops paid rows whose New York Paid Date is still last year). The sidebar "Load all paid history" checkbox fetches every Completed design, including undated ones (cached separately).
 
 </coding_guidelines>

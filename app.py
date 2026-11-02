@@ -48,6 +48,14 @@ except Exception as e:
 if FIXTURE_PATH:
     st.info(f"Offline mode: data loaded from fixture `{FIXTURE_PATH}` (MW_FIXTURE_PATH).")
 
+if df.empty:
+    # The sidebar date pickers below need at least one row to set their bounds.
+    st.info("Merchwizard returned no payable or paid designs.")
+    if st.button("Refresh Data", key="refresh_empty"):
+        st.cache_data.clear()
+        st.rerun()
+    st.stop()
+
 if st.button("Refresh Data"):
     st.cache_data.clear()
     st.rerun()
@@ -56,7 +64,8 @@ if st.button("Refresh Data"):
 st.sidebar.header("Filters")
 
 PAYMENT_STATUSES = ["Awaiting Approval", "Outstanding", "Paid"]
-current_year = datetime.now().year
+# New York time, matching mw_api's month bucketing and default paid-history window.
+current_year = datetime.now(mw_api.NY_TZ).year
 
 # Read by the fetch call above via st.session_state["load_all_history"]; toggling it
 # reruns the script, so the new value is in session state before the fetch runs.
@@ -185,7 +194,7 @@ paid_ytd = money_sum(budget_df, "Paid")
 outstanding_ytd = money_sum(budget_df, "Outstanding")
 awaiting_ytd = money_sum(budget_df, "Awaiting Approval")
 ytd_freelancer_spend = paid_ytd + outstanding_ytd
-current_month = datetime.now().month
+current_month = datetime.now(mw_api.NY_TZ).month
 expected_spend = MONTHLY_BUDGET * current_month
 budget_remaining = ANNUAL_BUDGET - ytd_freelancer_spend
 on_track = ytd_freelancer_spend <= expected_spend
@@ -213,8 +222,9 @@ budget_caption = (
 )
 if not load_all_history:
     budget_caption += (
-        " Only this year's paid designs are loaded; undated legacy paid items are not "
-        "loaded. Tick 'Load all paid history' in the sidebar to include them."
+        " Only designs paid this year (New York time) are loaded; earlier and undated "
+        "legacy paid items are not loaded. Tick 'Load all paid history' in the sidebar "
+        "to include them."
     )
 st.caption(budget_caption)
 
