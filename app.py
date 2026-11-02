@@ -281,7 +281,7 @@ if not dated_committed.empty:
     monthly_display = monthly.copy()
     monthly_display["Budget"] = MONTHLY_BUDGET
     monthly_display["Over/Under"] = MONTHLY_BUDGET - monthly_display["Total"]
-    st.dataframe(monthly_display, use_container_width=True)
+    st.dataframe(monthly_display.round(2), use_container_width=True)
 else:
     st.info("No paid or outstanding freelancer designs with an approval date in the current filter.")
 
@@ -391,12 +391,12 @@ if not paid_df.empty:
     if paid_table.size <= 200_000:
         paid_view = paid_table.style.apply(highlight_mismatch, axis=1).format(
             {
-                "Total": "${:,.2f}",
-                "Paid Amount": "${:,.2f}",
-                "Days to Pay": "{:,.0f}",
-            },
-            na_rep="",
-        ).format({"Paid Date": lambda d: "date unknown" if pd.isna(d) else str(d)[:10]})
+                "Paid Date": lambda d: "date unknown" if pd.isna(d) else str(d)[:10],
+                "Total": lambda v: f"${v:,.2f}",
+                "Paid Amount": lambda v: f"${v:,.2f}",
+                "Days to Pay": lambda v: "" if pd.isna(v) else f"{v:,.0f}",
+            }
+        )
     else:
         paid_view = paid_table
     st.dataframe(paid_view, use_container_width=True, hide_index=True)
